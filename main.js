@@ -3,10 +3,19 @@ const productsContainer = document.querySelector(".products");
 const productDetails = document.querySelector(".product-details");
 const productDetailsContent = document.querySelector(".product-details__content");
 const productDetailsCloseBtn = document.querySelector(".product-details__close-btn");
-
+const priceSort = document.querySelector("#price-sort");
+const cartContent = document.querySelector(".cart__content");
 
 let products = [];
+let cart = [];
 let filter = "All";
+
+const icons = [
+    { category: "electronics", icon: "🖥️" },
+    { category: "jewelery", icon: "💍" },
+    { category: "men's clothing", icon: "👕" },
+    { category: "women's clothing", icon: "👗" }
+];
 
 async function loadCategories() {
     const response = await fetch('https://fakestoreapi.com/products/categories');
@@ -38,13 +47,6 @@ function renderNavListLinks(categories) {
 }
 
 function renderProducts(products) {
-    const icons = [
-        { category: "electronics", icon: "🖥️" },
-        { category: "jewelery", icon: "💍" },
-        { category: "men's clothing", icon: "👕" },
-        { category: "women's clothing", icon: "👗" }
-    ];
-
     shuffleArray(products);
 
     productsContainer.innerHTML = products
@@ -54,15 +56,73 @@ function renderProducts(products) {
         else return product;
     })
     .sort((a, b) => {
+        if (priceSort.value === "high") return b.price - a.price;
+        else if (priceSort.value === "low") return a.price - b.price;
         return a;
     })
-    .map(({id, title, price, category}) => `
-        <div class="products__item" data-id="${id}" data-category="${category}">
+    .map(({id, title, price, category}) => { 
+        const [priceStart, priceEnd] = price.toFixed(2).split(".");
+
+        return `
+        <div class="products__item ${productInCart(id) ? "in-cart" : ""}" data-id="${id}" data-category="${category}">
             <div class="products__item-image">${icons.find(item=> item.category === category).icon}</div>
             <div class="products__item-title">${title}</div>
-            <div class="products__item-price">$${price}</div>
+            <div class="products__item-price">${priceStart}<span class="products__price-end">${priceEnd}</span></div>
+            <button class="products__add-to-cart-btn">${productInCart(id) ? "Remove from cart" : "Add to cart"}</button>
+        </div>
+    `}).join("");
+}
+
+function renderCart() {
+    cartContent.innerHTML = cart.map(item => `
+        <div class="cart__item" data-id="${item.id}">
+        <div class="cart__item-image">${icons.find(obj=> obj.category === item.category).icon}</div>
+        <div class="cart__item-title">${item.title}</div>
+        <div class="cart__item-price">${item.price}</div>
+        <div class="cart__item-quantity">${item.quantity}</div>
+        <button title="Remove from cart" class="cart__remove-from-cart-btn">Remove</button>
         </div>
     `).join("");
+}
+
+function addToCart(id) {
+    const product = products.find(product => product.id === id);
+
+    updateProductElement(id);
+
+    if (productInCart(id)) productInCart.quantity++;
+    else cart.push({...product, quantity: 1});
+}
+
+function removeFromCart(id) {
+    const cartItem = cart.find(item => item.id === id);
+    const productEl = productsContainer.querySelector(`.products__item[data-id="${id}"]`);
+
+    cartItem.quantity--;
+
+    if (cartItem.quantity <= 0) {
+        cart = cart.filter(item => item.id !== id);
+        updateProductElement(id, true);
+    }
+}
+
+function productInCart(id) {
+    return cart.find(item => item.id === id);
+};
+
+function updateProductElement(id, remove = false) {
+    const element = productsContainer.querySelector(`.products__item[data-id="${id}"]`);
+    const btn = element.querySelector(".products__add-to-cart-btn");
+
+    if (remove) {
+        element.classList.remove("in-cart");
+        btn.textContent = "Add to cart";
+    }
+    else {
+        element.classList.add("in-cart");
+        btn.textContent = "Remove from cart";
+
+    }
 }
 
 loadCategories().then(categories => renderNavListLinks(categories));
@@ -81,18 +141,51 @@ navList.addEventListener("click", function(e) {
 });
 
 productsContainer.addEventListener("click", function(e) {
-    const el = e.target.closest(".products__item");
-    const id = parseInt(el.dataset.id);
-    const {title, price, description} = products.find(product => product.id === id);
+    // Add to cart
+    const addToCartBtn = e.target.closest(".products__add-to-cart-btn");
+    if (addToCartBtn) {
+        const productItem = addToCartBtn.closest(".products__item");
+        const id = parseInt(productItem.dataset.id);
 
-    productDetails.showModal();
+        if (productInCart(id)) removeFromCart(id);
+        else addToCart(id);
 
-    productDetailsContent.innerHTML = `
-        <div class="product-details__item-title">${title} - $${price}</div>
-        <div class="product-details__item-description">${description}</div>
-    `;
+        renderCart();
+        return;
+    }
+
+    // Show product details
+    const productItem = e.target.closest(".products__item");
+    if (productItem) {
+        const id = parseInt(productItem.dataset.id);
+        const {title, price, description} = products.find(product => product.id === id);
+
+        productDetails.showModal();
+
+        productDetailsContent.innerHTML = `
+            <div class="product-details__item-title">${title} - $${price}</div>
+            <div class="product-details__item-description">${description}</div>
+        `;
+    }
+
+});
+
+cartContent.addEventListener("click", function(e) {
+    // Remove from cart
+    const removeBtn = e.target.closest(".cart__remove-from-cart-btn");
+    if (removeBtn) {
+        const productItem = removeBtn.closest(".cart__item");
+        const id = parseInt(productItem.dataset.id);
+
+        removeFromCart(id);
+        renderCart();
+    }
 });
 
 productDetailsCloseBtn.addEventListener("click", function() {
     productDetails.close();
+});
+
+priceSort.addEventListener("change", function() {
+    renderProducts(products);
 });

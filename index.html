@@ -22,8 +22,25 @@
         </nav>
       </header>
       <main class="main">
-        <h1>Products</h1>
+        <div class="main__top">
+          <h1>Products</h1>
+          <div class="sorting">
+            <label class="sorting__label" for="price-sort">Sort by:</label>
+            <select name="price-sort" id="price-sort">
+              <option value="default">Relevance</option>
+              <option value="high">High to low</option>
+              <option value="low">Low to high</option>
+            </select>
+          </div>
+        </div>
         <div class="products"></div>
+        <div class="cart">
+          <div class="cart__top">
+            <div class="cart__heading">Cart</div>
+            <div class="cart__total"></div>
+          </div>
+          <div class="cart__content"></div>
+        </div>
       </main>
     </div>
 
