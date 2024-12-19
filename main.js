@@ -4,7 +4,11 @@ const productDetails = document.querySelector(".product-details");
 const productDetailsContent = document.querySelector(".product-details__content");
 const productDetailsCloseBtn = document.querySelector(".product-details__close-btn");
 const priceSort = document.querySelector("#price-sort");
+const cartElement = document.querySelector(".cart");
+const cartHeading = document.querySelector(".cart__heading");
+const cartTotalValue = document.querySelector(".cart__total-value");
 const cartContent = document.querySelector(".cart__content");
+const cartToggleBtn = document.querySelector(".cart__toggle-btn");
 
 let products = [];
 let cart = [];
@@ -24,6 +28,8 @@ const icons = [
 const productInCart = (id) => cart.find(item => item.id === id);
 
 const getCategoryIcon = (category) => icons.find(icon => icon.category === category)?.icon;
+
+const getCartTotal = () => cart.reduce((acc, item) => acc + item.price * item.quantity, 0);
 
 const shuffleArray = (array) => {
     for (var i = array.length - 1; i >= 0; i--) {
@@ -99,6 +105,16 @@ function renderCart() {
         <button title="Remove from cart" class="cart__remove-from-cart-btn">Remove</button>
         </div>
     `).join("");
+    updateCartHeading();
+}
+
+function updateCartHeading() {
+    cartHeading.innerHTML = `
+        Cart
+        <span class="pill">${cart.length > 0 ? `${cart.length} items in cart` : "No items in cart"}</span>
+    `;
+    cartTotalValue.textContent = getCartTotal().toFixed(2);
+    
 }
 
 function updateProductElement(id, remove = false) {
@@ -204,6 +220,7 @@ loadProducts()
 // -----------------------------------------------------
 
 navList.addEventListener("click", function(e) {
+    // Filter products by category
     const el = e.target.closest(".header__nav-link");
     const category = el.textContent;
     filter = category;
@@ -250,4 +267,8 @@ productDetailsCloseBtn.addEventListener("click", function() {
 // Sort products by price
 priceSort.addEventListener("change", function() {
     renderProducts(products);
+});
+
+cartToggleBtn.addEventListener("click", () => {
+    cartElement.classList.toggle("open");
 });

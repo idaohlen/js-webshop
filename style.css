@@ -23,6 +23,17 @@ h1 {
 button {
     font-family: inherit;
     font-size: 1.4rem;
+    color: #585858;
+    background: white;
+    border: 1px solid #cdcdcd;
+    padding: .5rem 1rem;
+    cursor: pointer;
+    transition: all .4s;
+
+    &:hover {
+        color: black;
+        border-color: #767676;
+    }
 }
 
 /* Header */
@@ -103,7 +114,7 @@ button {
 select {
     padding: .5rem;
     font-size: 1.6rem;
-    border: 1px solid rgb(195, 195, 195);
+    border: 1px solid #c3c3c3;
 }
 
 /* Products */
@@ -176,19 +187,9 @@ select {
     text-align: center;
     width: 100%;
     padding: 1rem 2rem;
-    color: #585858;
-    font-family: inherit;
     font-size: 1.4rem;
-    background: white;
     border: 1px solid #c3c3c3;
     border-radius: 10rem;
-    transition: all .4s;
-
-    &:hover {
-        cursor: pointer;
-        color: black;
-        border-color: #767676;
-    }
 }
 
 .in-cart {
@@ -210,27 +211,100 @@ select {
     right: 0;
     padding: 2rem;
     background: #ffd6dd;
+    transition: all .3s, max-height .5s;
+    max-height: 7rem;
+}
+
+.cart.open {
+    max-height: 50rem;
+
+    .cart__content {
+        display: flex;
+    }
 }
 
 .cart__top {
     display: flex;
-    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
 }
 
 .cart__heading {
     font-weight: 800;
+    margin-right: auto;
+
+    .pill {
+        margin-left: 1rem;
+    }
 }
 
 .cart__content {
-    display: flex;
+    display: none;
+    margin-top: 1rem;
     gap: 1rem;
+    overflow-x: auto;
 }
 
 .cart__remove-from-cart-btn {
     background: pink;
-    border: none;
+    border: 1px solid transparent;
     border-radius: 10rem;
-    padding: .5rem;
+    padding: .5rem 1rem;
+
+    &:hover {
+        border-color: black;
+    }
+}
+
+.cart__item {
+    position: relative;
+    width: 10rem;
+    padding: 1rem;
+    background: white;
+    border-radius: 6px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+    gap: .4rem;
+}
+
+.cart__item-image {
+    font-size: 4rem;
+}
+
+.cart__item-title {
+    max-width: 100%;
+    align-self: flex-start;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.cart__item-price {
+    font-weight: 600;
+}
+
+.cart__item-quantity {
+    position: absolute;
+    top: .5rem;
+    right: .5rem;
+    width: 2rem;
+    height: 2rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 50%;
+    background: pink;
+}
+
+.cart__total {
+    font-weight: 800;
+}
+
+.cart__total-value {
+    font-weight: 400;
 }
 
 /* Product details dialog */
@@ -291,4 +365,14 @@ select {
     &:hover {
         cursor: pointer;
     }
+}
+
+/* Pill */
+
+.pill {
+    font-size: 1.2rem;
+    font-weight: 300;
+    background: white;
+    border-radius: 10rem;
+    padding: .5rem 1rem;
 }
