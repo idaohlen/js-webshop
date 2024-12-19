@@ -64,18 +64,18 @@ function renderProducts(products) {
         const [priceStart, priceEnd] = price.toFixed(2).split(".");
 
         return `
-        <div class="products__item ${productInCart(id) ? "in-cart" : ""}" data-id="${id}" data-category="${category}">
+        <div class="products__item product ${productInCart(id) ? "in-cart" : ""}" data-id="${id}" data-category="${category}">
             <div class="products__item-image">${icons.find(item=> item.category === category).icon}</div>
             <div class="products__item-title">${title}</div>
             <div class="products__item-price">${priceStart}<span class="products__price-end">${priceEnd}</span></div>
-            <button class="products__add-to-cart-btn">${productInCart(id) ? "Remove from cart" : "Add to cart"}</button>
+            <button class="add-to-cart-btn">${productInCart(id) ? "Remove from cart" : "Add to cart"}</button>
         </div>
     `}).join("");
 }
 
 function renderCart() {
     cartContent.innerHTML = cart.map(item => `
-        <div class="cart__item" data-id="${item.id}">
+        <div class="cart__item product" data-id="${item.id}">
         <div class="cart__item-image">${icons.find(obj=> obj.category === item.category).icon}</div>
         <div class="cart__item-title">${item.title}</div>
         <div class="cart__item-price">${item.price}</div>
@@ -96,7 +96,6 @@ function addToCart(id) {
 
 function removeFromCart(id) {
     const cartItem = cart.find(item => item.id === id);
-    const productEl = productsContainer.querySelector(`.products__item[data-id="${id}"]`);
 
     cartItem.quantity--;
 
@@ -111,8 +110,8 @@ function productInCart(id) {
 };
 
 function updateProductElement(id, remove = false) {
-    const element = productsContainer.querySelector(`.products__item[data-id="${id}"]`);
-    const btn = element.querySelector(".products__add-to-cart-btn");
+    const element = productsContainer.querySelector(`.product[data-id="${id}"]`);
+    const btn = element.querySelector(".add-to-cart-btn");
 
     if (remove) {
         element.classList.remove("in-cart");
@@ -140,11 +139,11 @@ navList.addEventListener("click", function(e) {
     renderProducts(products);
 });
 
-productsContainer.addEventListener("click", function(e) {
+document.addEventListener("click", function(e) {
     // Add to cart
-    const addToCartBtn = e.target.closest(".products__add-to-cart-btn");
+    const addToCartBtn = e.target.closest(".add-to-cart-btn");
     if (addToCartBtn) {
-        const productItem = addToCartBtn.closest(".products__item");
+        const productItem = addToCartBtn.closest(".product");
         const id = parseInt(productItem.dataset.id);
 
         if (productInCart(id)) removeFromCart(id);
@@ -155,16 +154,22 @@ productsContainer.addEventListener("click", function(e) {
     }
 
     // Show product details
-    const productItem = e.target.closest(".products__item");
+    const productItem = e.target.closest(".product");
     if (productItem) {
         const id = parseInt(productItem.dataset.id);
-        const {title, price, description} = products.find(product => product.id === id);
+        const { title, price, category, description } = products.find(product => product.id === id);
 
         productDetails.showModal();
 
         productDetailsContent.innerHTML = `
-            <div class="product-details__item-title">${title} - $${price}</div>
-            <div class="product-details__item-description">${description}</div>
+            <div class="product-details__item product" data-id="${id}">
+                <div class="product-details__item-image">${icons.find(obj=> obj.category === category).icon}</div>
+                <div class="product-details__item-details">
+                    <div class="product-details__item-title">${title} - $${price}</div>
+                    <div class="product-details__item-description">${description}</div>
+                    <div class="add-to-cart-btn">${productInCart(id) ? "Remove from cart" : "Add to cart"}</div>
+                </div>
+            </div>
         `;
     }
 
