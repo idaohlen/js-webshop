@@ -87,6 +87,11 @@ function renderProducts(products) {
 
         return `
         <div class="products__item product ${productInCart(id) ? "in-cart" : ""}" data-id="${id}" data-category="${category}">
+            <div class="products__item-quantity">
+                <div class="products__item-quantity-value quantity-value pill pill__pink">${productInCart(id)?.quantity}</div>
+                <div class="products__item-quantity-increase pill pill__outline">+</div>
+                <div class="products__item-quantity-decrease pill pill__outline">-</div>
+            </div>
             <div class="products__item-image">${getCategoryIcon(category)}</div>
             <div class="products__item-title">${title}</div>
             <div class="products__item-price">${priceStart}<span class="products__price-end">${priceEnd}</span></div>
@@ -121,6 +126,9 @@ function updateProductElement(id, remove = false) {
     const element = productsContainer.querySelector(`.product[data-id="${id}"]`);
     let btn = element.querySelector(".add-to-cart-btn");
 
+    const quantityValue = element.querySelector(".quantity-value");
+    if (quantityValue) quantityValue.textContent = productInCart(id)?.quantity;
+
     if (remove) {
         element.classList.remove("in-cart");
         btn.textContent = "Add to cart";
@@ -146,11 +154,11 @@ function updateProductElement(id, remove = false) {
 
 function addToCart(id) {
     const product = products.find(product => product.id === id);
+    
+    if (productInCart(id)) productInCart(id).quantity++;
+    else cart.push({...product, quantity: 1});
 
     updateProductElement(id);
-
-    if (productInCart(id)) productInCart.quantity++;
-    else cart.push({...product, quantity: 1});
 
     gtag('event', 'add_to_cart', {
         'event_category': 'Cart',
@@ -170,7 +178,10 @@ function removeFromCart(id) {
     if (cartItem.quantity <= 0) {
         cart = cart.filter(item => item.id !== id);
         updateProductElement(id, true);
+    } else {
+        updateProductElement(id);
     }
+
 
     gtag('event', 'remove_from_cart', {
         'event_category': 'Cart',
@@ -236,9 +247,9 @@ loadProducts()
         renderProducts(products);
     });
 
-// -----------------------------------------------------
+/* ----------------------------------------------------- */
 // Event listeners
-// -----------------------------------------------------
+/* ----------------------------------------------------- */
 
 navList.addEventListener("click", function(e) {
     // Filter products by category
@@ -249,11 +260,16 @@ navList.addEventListener("click", function(e) {
 });
 
 document.addEventListener("click", function(e) {
+    let productItem = e.target.closest(".product");
+    let id;
+    if(productItem) {
+        id = parseInt(productItem.dataset.id);
+    }
+
     // Add to cart
     const addToCartBtn = e.target.closest(".add-to-cart-btn");
     if (addToCartBtn) {
-        const productItem = addToCartBtn.closest(".product");
-        const id = parseInt(productItem.dataset.id);
+        
 
         if (productInCart(id)) removeFromCart(id);
         else addToCart(id);
@@ -262,8 +278,22 @@ document.addEventListener("click", function(e) {
         return;
     }
 
+    const increaseQuantity = e.target.closest(".products__item-quantity-increase");
+    if (increaseQuantity) {
+        addToCart(id);
+        renderCart();
+        return;
+    }
+
+    const decreaseQuantity = e.target.closest(".products__item-quantity-decrease");
+    if (decreaseQuantity) {
+        removeFromCart(id);
+        renderCart();
+        return;
+    }
+
     // Show product details modal
-    const productItem = e.target.closest(".products__item");
+    productItem = e.target.closest(".products__item");
     if (productItem) {
         showProductDetails(productItem);
     }
