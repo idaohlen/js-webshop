@@ -17,6 +17,27 @@ const icons = [
     { category: "women's clothing", icon: "👗" }
 ];
 
+/* ----------------------------------------------------- */
+// Utility functions
+/* ----------------------------------------------------- */
+
+const productInCart = (id) => cart.find(item => item.id === id);
+
+const getCategoryIcon = (category) => icons.find(icon => icon.category === category)?.icon;
+
+const shuffleArray = (array) => {
+    for (var i = array.length - 1; i >= 0; i--) {
+        var j = Math.floor(Math.random() * (i + 1));
+        var temp = array[i];
+        array[i] = array[j];
+        array[j] = temp;
+    }
+}
+
+ /* ----------------------------------------------------- */
+// Fetch API data
+/* ----------------------------------------------------- */
+
 async function loadCategories() {
     const response = await fetch('https://fakestoreapi.com/products/categories');
     if (!response.ok) throw new Error("Unable to fetch categories.");
@@ -32,14 +53,9 @@ async function loadProducts() {
     return data;
 }
 
-function shuffleArray(array) {
-    for (var i = array.length - 1; i >= 0; i--) {
-        var j = Math.floor(Math.random() * (i + 1));
-        var temp = array[i];
-        array[i] = array[j];
-        array[j] = temp;
-    }
-}
+/* ----------------------------------------------------- */
+// Rendering elements
+/* ----------------------------------------------------- */
 
 function renderNavListLinks(categories) {
     const html = categories.map(category => `<li class="header__nav-link">${category}</li>`).join("");
@@ -65,7 +81,7 @@ function renderProducts(products) {
 
         return `
         <div class="products__item product ${productInCart(id) ? "in-cart" : ""}" data-id="${id}" data-category="${category}">
-            <div class="products__item-image">${icons.find(item=> item.category === category).icon}</div>
+            <div class="products__item-image">${getCategoryIcon(category)}</div>
             <div class="products__item-title">${title}</div>
             <div class="products__item-price">${priceStart}<span class="products__price-end">${priceEnd}</span></div>
             <button class="add-to-cart-btn">${productInCart(id) ? "Remove from cart" : "Add to cart"}</button>
@@ -76,7 +92,7 @@ function renderProducts(products) {
 function renderCart() {
     cartContent.innerHTML = cart.map(item => `
         <div class="cart__item product" data-id="${item.id}">
-        <div class="cart__item-image">${icons.find(obj=> obj.category === item.category).icon}</div>
+        <div class="cart__item-image">${getCategoryIcon(item.category)}</div>
         <div class="cart__item-title">${item.title}</div>
         <div class="cart__item-price">${item.price}</div>
         <div class="cart__item-quantity">${item.quantity}</div>
@@ -84,6 +100,33 @@ function renderCart() {
         </div>
     `).join("");
 }
+
+function updateProductElement(id, remove = false) {
+    const element = productsContainer.querySelector(`.product[data-id="${id}"]`);
+    let btn = element.querySelector(".add-to-cart-btn");
+
+    if (remove) {
+        element.classList.remove("in-cart");
+        btn.textContent = "Add to cart";
+    }
+    else {
+        element.classList.add("in-cart");
+        btn.textContent = "Remove from cart";
+    }
+
+    if (productDetails.open) {
+        btn = productDetailsContent.querySelector(".add-to-cart-btn");
+        if (btn) {
+            btn.textContent = remove ? "Add to cart" : "Remove from cart";
+            const product = btn.closest(".product");
+            product.classList.toggle("in-cart");
+        }
+    }
+}
+
+/* ----------------------------------------------------- */
+// Cart logic
+/* ----------------------------------------------------- */
 
 function addToCart(id) {
     const product = products.find(product => product.id === id);
@@ -105,24 +148,35 @@ function removeFromCart(id) {
     }
 }
 
-function productInCart(id) {
-    return cart.find(item => item.id === id);
-};
+/* ----------------------------------------------------- */
+// Product details modal
+/* ----------------------------------------------------- */
 
-function updateProductElement(id, remove = false) {
-    const element = productsContainer.querySelector(`.product[data-id="${id}"]`);
-    const btn = element.querySelector(".add-to-cart-btn");
+function showProductDetails(product) {
+    const id = parseInt(product.dataset.id);
+    const { title, price, category, description } = products.find(product => product.id === id);
 
-    if (remove) {
-        element.classList.remove("in-cart");
-        btn.textContent = "Add to cart";
-    }
-    else {
-        element.classList.add("in-cart");
-        btn.textContent = "Remove from cart";
+    productDetails.showModal();
 
-    }
+    productDetailsContent.innerHTML = `
+        <div class="product-details__item product ${productInCart(id) ? "in-cart" : ""}" data-id="${id}">
+            <div class="product-details__item-image">${getCategoryIcon(category)}</div>
+            <div class="product-details__item-details">
+                <div class="product-details__item-title">${title} - $${price}</div>
+                <div class="product-details__item-description">${description}</div>
+                <div class="add-to-cart-btn">${productInCart(id) ? "Remove from cart" : "Add to cart"}</div>
+            </div>
+        </div>
+    `;
 }
+
+function hideProductDetails() {
+    productDetails.close();
+}
+
+/* ----------------------------------------------------- */
+// Initial load + render content
+/* ----------------------------------------------------- */
 
 loadCategories().then(categories => renderNavListLinks(categories));
 
@@ -131,6 +185,10 @@ loadProducts()
         renderProducts(products);
         
     });
+
+// -----------------------------------------------------
+// Event listeners
+// -----------------------------------------------------
 
 navList.addEventListener("click", function(e) {
     const el = e.target.closest(".header__nav-link");
@@ -153,26 +211,11 @@ document.addEventListener("click", function(e) {
         return;
     }
 
-    // Show product details
+    // Show product details modal
     const productItem = e.target.closest(".products__item");
     if (productItem) {
-        const id = parseInt(productItem.dataset.id);
-        const { title, price, category, description } = products.find(product => product.id === id);
-
-        productDetails.showModal();
-
-        productDetailsContent.innerHTML = `
-            <div class="product-details__item product" data-id="${id}">
-                <div class="product-details__item-image">${icons.find(obj=> obj.category === category).icon}</div>
-                <div class="product-details__item-details">
-                    <div class="product-details__item-title">${title} - $${price}</div>
-                    <div class="product-details__item-description">${description}</div>
-                    <div class="add-to-cart-btn">${productInCart(id) ? "Remove from cart" : "Add to cart"}</div>
-                </div>
-            </div>
-        `;
+        showProductDetails(productItem);
     }
-
 });
 
 cartContent.addEventListener("click", function(e) {
@@ -188,9 +231,10 @@ cartContent.addEventListener("click", function(e) {
 });
 
 productDetailsCloseBtn.addEventListener("click", function() {
-    productDetails.close();
+    hideProductDetails();
 });
 
+// Sort products by price
 priceSort.addEventListener("change", function() {
     renderProducts(products);
 });

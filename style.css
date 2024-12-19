@@ -192,7 +192,9 @@ select {
 }
 
 .in-cart {
-    border: 2px solid #ffd4dc;
+    &.products__item {
+        border: 2px solid #ffd4dc;
+    }
     
     .add-to-cart-btn {
         background: #ffe5ea;
@@ -241,7 +243,7 @@ select {
     max-height: 500px;
     overflow: auto;
     border: none;
-    box-shadow: 0 0 10px rgb(179, 179, 179);
+    box-shadow: 0 0 10px #b3b3b3;
 }
 
 .product-details__content {
