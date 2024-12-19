@@ -206,7 +206,7 @@ function showProductDetails(product) {
             <div class="product-details__item-details">
                 <div class="product-details__item-title">${title} - $${price}</div>
                 <div class="product-details__item-description">${description}</div>
-                <div class="add-to-cart-btn">${productInCart(id) ? "Remove from cart" : "Add to cart"}</div>
+                <button class="add-to-cart-btn">${productInCart(id) ? "Remove from cart" : "Add to cart"}</button>
             </div>
         </div>
     `;
@@ -288,7 +288,7 @@ priceSort.addEventListener("change", function() {
         'event_category': 'Products',
         'event_label': priceSort.value
     });
-    
+
     renderProducts(products);
 });
 
