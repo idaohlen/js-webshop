@@ -155,7 +155,8 @@ function addToCart(id) {
     gtag('event', 'add_to_cart', {
         'event_category': 'Cart',
         'event_label': product.title,
-        'value': product.price
+        'value': product.price,
+        'debug_mode': true
     });
 
    saveCart();
@@ -174,7 +175,8 @@ function removeFromCart(id) {
     gtag('event', 'remove_from_cart', {
         'event_category': 'Cart',
         'event_label': cartItem.title,
-        'value': cartItem.price
+        'value': cartItem.price,
+        'debug_mode': true
     });
 
     saveCart();
@@ -195,7 +197,8 @@ function showProductDetails(product) {
     gtag('event', 'view_item', {
         'event_category': 'Product',
         'event_label': title,
-        'value': price
+        'value': price,
+        'debug_mode': true
     });
 
     productDetails.showModal();
@@ -286,7 +289,8 @@ productDetailsCloseBtn.addEventListener("click", function() {
 priceSort.addEventListener("change", function() {
     gtag('event', 'sort_products', {
         'event_category': 'Products',
-        'event_label': priceSort.value
+        'event_label': priceSort.value,
+        'debug_mode': true
     });
 
     renderProducts(products);
