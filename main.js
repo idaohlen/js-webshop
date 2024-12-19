@@ -182,7 +182,6 @@ function removeFromCart(id) {
         updateProductElement(id);
     }
 
-
     gtag('event', 'remove_from_cart', {
         'event_category': 'Cart',
         'event_label': cartItem.title,
