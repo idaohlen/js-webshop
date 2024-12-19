@@ -135,6 +135,8 @@ function addToCart(id) {
 
     if (productInCart(id)) productInCart.quantity++;
     else cart.push({...product, quantity: 1});
+
+   saveCart();
 }
 
 function removeFromCart(id) {
@@ -146,6 +148,12 @@ function removeFromCart(id) {
         cart = cart.filter(item => item.id !== id);
         updateProductElement(id, true);
     }
+
+    saveCart();
+}
+
+function saveCart() {
+    localStorage.setItem("cart", JSON.stringify(cart));
 }
 
 /* ----------------------------------------------------- */
@@ -182,8 +190,13 @@ loadCategories().then(categories => renderNavListLinks(categories));
 
 loadProducts()
     .then(products => {
+        // Load cart from local storage
+        if (localStorage.getItem("cart")) {
+            cart = JSON.parse(localStorage.getItem("cart") || []);
+            renderCart();
+        }
+        // Render products on page
         renderProducts(products);
-        
     });
 
 // -----------------------------------------------------
