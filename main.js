@@ -154,7 +154,7 @@ document.addEventListener("click", function(e) {
     }
 
     // Show product details
-    const productItem = e.target.closest(".product");
+    const productItem = e.target.closest(".products__item");
     if (productItem) {
         const id = parseInt(productItem.dataset.id);
         const { title, price, category, description } = products.find(product => product.id === id);
