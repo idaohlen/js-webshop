@@ -152,6 +152,12 @@ function addToCart(id) {
     if (productInCart(id)) productInCart.quantity++;
     else cart.push({...product, quantity: 1});
 
+    gtag('event', 'add_to_cart', {
+        'event_category': 'Cart',
+        'event_label': product.title,
+        'value': product.price
+    });
+
    saveCart();
 }
 
@@ -164,6 +170,12 @@ function removeFromCart(id) {
         cart = cart.filter(item => item.id !== id);
         updateProductElement(id, true);
     }
+
+    gtag('event', 'remove_from_cart', {
+        'event_category': 'Cart',
+        'event_label': cartItem.title,
+        'value': cartItem.price
+    });
 
     saveCart();
 }
@@ -179,6 +191,12 @@ function saveCart() {
 function showProductDetails(product) {
     const id = parseInt(product.dataset.id);
     const { title, price, category, description } = products.find(product => product.id === id);
+
+    gtag('event', 'view_item', {
+        'event_category': 'Product',
+        'event_label': title,
+        'value': price
+    });
 
     productDetails.showModal();
 
@@ -266,6 +284,11 @@ productDetailsCloseBtn.addEventListener("click", function() {
 
 // Sort products by price
 priceSort.addEventListener("change", function() {
+    gtag('event', 'sort_products', {
+        'event_category': 'Products',
+        'event_label': priceSort.value
+    });
+    
     renderProducts(products);
 });
 
