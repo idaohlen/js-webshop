@@ -1,6 +1,8 @@
 # js-webshop
 
-Detta är en enkel mockup av ett webbshop interface gjort med JavaScript. Produkter hämtas in via API:et https://fakestoreapi.com/ och kan visas utifrån kategori och sortera efter pris. Klickar man på produkten får man upp en ruta där man kan läsa en produktbeskrivning. Produkterna kan läggas till i och tas bort ur en varukorg, och i varukorgen kan man se den totala summan för alla produkter som ligger i varukorgen.
+Detta är en enkel mockup av ett webbshop interface gjort med JavaScript. Produkter hämtas in via API:et https://fakestoreapi.com/ och kan visas utifrån kategori och sortera efter pris. Klickar man på produkten får man upp en ruta där man kan läsa en produktbeskrivning. Produkterna kan läggas till i och tas bort ur en varukorg, och i varukorgen kan man se den totala summan för alla produkter som ligger i varukorgen. Den sparas även via local storage, så om man navigerar iväg från sidan eller stänger webbläsaren så kommer sidan komma ihåg vad man lagt i varukorgen. Jag har valt att visa emojis istället för att ladda in bilder från API:n för att spara laddningstid och inte slösa onödig bandbredd.
+
+Sidan är funktionell, men kan förbättras på många sätt. En checkout-vy hade med fördel kunnat läggas till för att ge en mer komplett illustration av en riktigt webbshop, och små förbättringar som att kunna ändra produktantal i detaljvyn och i varukorgen, klicka utanför detaljvyn för att smidigt kunna stänga den, etc. En mer väldesignat mobil-vy hade också varit bra då vissa element inte är helt optimerade för det och nog ser like konstiga ut eller inte så snygga som de hade kunnat vara vid lägre skärmstorlek. Andra förbättringar skulle även kunna vara att visa en text eller en laddningsanimation medan produktdatan läses in för att ge besökaren bättre information om vad som händer, och ev. kunna hantera pagination eller infinite scrolling ifall man skulle ha ett större antal produkter att visa.
 
 
 ## Google analytics & gtag.js
